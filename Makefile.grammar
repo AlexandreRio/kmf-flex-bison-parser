@@ -1,0 +1,23 @@
+CC=gcc
+YACC=bison
+LEX=flex
+
+json: json.o
+	ln -nfs $< $@
+
+lexer: json.lex.c
+	$(CC) -o json json.lex.c
+
+%.o: %.lex.c %.tab.c %.tab.h
+	$(CC) -o $@ $^ -lfl
+
+%.lex.c: %.l
+	$(LEX) -o $(patsubst %.l,%.lex.c,$<) $<
+
+%.tab.c %.tab.h: %.y
+	$(YACC) -d $<
+
+.PHONY: clean
+
+clean:
+	rm -f *.lex.c *.tab.c *.tab.h *.o json
